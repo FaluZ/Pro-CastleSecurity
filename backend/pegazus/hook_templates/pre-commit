@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Hook pre-commit generico de Proyecto-Pegazus.
+#
+# Instalado por 'pegazus install-hooks <repo>' en .githooks/ (versionado, se
+# comparte al hacer commit -- a diferencia de .git/hooks/, que es local a
+# cada maquina y nunca protege a nadie mas). Requiere que 'pegazus' este
+# instalado y en el PATH. Analiza solo los archivos en stage -- rapido, y
+# bloquea el commit (exit 1) si hay hallazgos de severidad alta/critica.
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+pegazus scan-staged "$REPO_ROOT"

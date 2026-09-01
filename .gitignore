@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+*.db
+
+# Node
+node_modules/
+dist/
+.tsbuildinfo
+
+# Frontend build
+frontend/dist/
+
+# Editor / OS
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+
+# Logs locales
+*.log
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
