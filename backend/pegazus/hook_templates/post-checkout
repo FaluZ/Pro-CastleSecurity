@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Hook post-checkout generico de Proyecto-Pegazus: se dispara tras
+# 'git clone' (checkout inicial) y tras 'git checkout <rama>'.
+#
+# Mismas limitaciones que post-merge: alerta inmediata, no prevencion (el
+# checkout ya sucedio para cuando este hook corre). Nota: en un 'git clone'
+# de este mismo repo, .githooks/ ya viene versionado, pero core.hooksPath
+# es config LOCAL -- quien clona todavia tiene que correr
+# 'pegazus install-hooks .' una vez (o 'git config core.hooksPath .githooks'
+# a mano) para activarlo. El respaldo de GitHub Actions no depende de esto.
+#
+# Instalado por 'pegazus install-hooks <repo>' en .githooks/.
+set -e
+
+PREV_HEAD="$1"
+NEW_HEAD="$2"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+pegazus scan-diff "$REPO_ROOT" "$PREV_HEAD" "$NEW_HEAD" || {
+  echo ""
+  echo "############################################################"
+  echo "# ALERTA Proyecto-Pegazus: revisa los hallazgos de arriba   #"
+  echo "# antes de ejecutar/instalar nada de este checkout.         #"
+  echo "############################################################"
+}

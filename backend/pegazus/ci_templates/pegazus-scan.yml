@@ -1,0 +1,40 @@
+# Respaldo server-side de Proyecto-Pegazus: corre la misma deteccion que el
+# hook pre-commit/post-merge local, pero en GitHub Actions -- cubre el caso
+# de alguien que comitea sin el hook local instalado (o lo salta con
+# --no-verify). Instalado por 'pegazus install-hooks <repo>'.
+#
+# IMPORTANTE: ajustar el paso "Instalar Pegazus" de abajo segun donde este
+# publicado el paquete para tu organizacion (indice privado, git+ssh,
+# submodulo...) -- no se puede adivinar eso, hay que decidirlo una vez y
+# fijarlo aqui.
+name: Proyecto-Pegazus scan
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pegazus-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # TODO: reemplazar por el metodo de instalacion real de 'pegazus' en
+      # tu organizacion (ver README de Proyecto-Pegazus, seccion CI).
+      - name: Instalar Pegazus
+        run: pip install pegazus
+
+      - name: Analizar cambios de este push/PR
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            FROM_REF="${{ github.event.pull_request.base.sha }}"
+          else
+            FROM_REF="${{ github.event.before }}"
+          fi
+          pegazus scan-diff . "$FROM_REF" "${{ github.sha }}"

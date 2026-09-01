@@ -1,0 +1,36 @@
+# Barrido periodico completo de Proyecto-Pegazus: a diferencia de
+# pegazus-scan.yml (que solo mira los archivos que cambiaron en cada
+# push/PR), este corre 'pegazus scan' completo -- incluye el historial
+# entero de git (busca marcadores enterrados en commits viejos) y las
+# reglas a nivel de proyecto (tareas de VS Code, etc.). Mas costoso, por eso
+# corre en cron, no en cada push. Instalado por 'pegazus install-hooks
+# <repo> --workflow'.
+#
+# Mismo TODO que en pegazus-scan.yml: ajustar el paso de instalacion de
+# 'pegazus' segun donde este publicado para tu organizacion.
+name: Proyecto-Pegazus full scan
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # lunes 06:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  pegazus-full-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # TODO: reemplazar por el metodo de instalacion real de 'pegazus' en
+      # tu organizacion (ver README de Proyecto-Pegazus, seccion CI).
+      - name: Instalar Pegazus
+        run: pip install pegazus
+
+      - name: Escaneo completo (historial de git + reglas de proyecto)
+        run: pegazus scan .

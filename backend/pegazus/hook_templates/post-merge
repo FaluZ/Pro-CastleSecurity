@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Hook post-merge generico de Proyecto-Pegazus: se dispara despues de un
+# 'git pull' (fetch + merge), incluyendo fast-forward.
+#
+# IMPORTANTE: git no tiene forma de bloquear un fast-forward ANTES de que
+# los archivos toquen disco -- este hook es deteccion inmediata + alerta
+# fuerte, no prevencion. La capa que sí puede prevenir del lado servidor es
+# el workflow de GitHub Actions instalado junto con este hook (rechaza el
+# push/PR aunque el hook local no este instalado o se haya saltado).
+#
+# Instalado por 'pegazus install-hooks <repo>' en .githooks/.
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+FROM_REF="$(git rev-parse ORIG_HEAD 2>/dev/null || echo 0000000000000000000000000000000000000000)"
+
+if ! pegazus scan-diff "$REPO_ROOT" "$FROM_REF" HEAD; then
+  echo ""
+  echo "############################################################"
+  echo "# ALERTA Proyecto-Pegazus: revisa los hallazgos de arriba   #"
+  echo "# antes de ejecutar/instalar nada de lo que se acaba de     #"
+  echo "# descargar con este pull.                                  #"
+  echo "############################################################"
+fi

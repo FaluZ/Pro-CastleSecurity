@@ -1,0 +1,39 @@
+[project]
+name = "pegazus"
+version = "0.1.0"
+description = "Proyecto-Pegazus: sistema local de analisis de proyectos (malware, inyecciones de codigo, EtherHiding, Contagious Interview)."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "pydantic>=2.7",
+    "yara-python>=4.5",
+    "typer>=0.12",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+pegazus = "pegazus.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["pegazus*"]
+
+[tool.setuptools.package-data]
+"pegazus.modules.malware" = ["rules/*.yar"]
+"pegazus.modules.etherhiding" = ["rules/*.yar"]
+"pegazus.hook_templates" = ["pre-commit", "post-merge", "post-checkout"]
+"pegazus.ci_templates" = ["*.yml"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
